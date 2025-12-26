@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { User } from '@/src/user.model'
 import { connectDB } from '@/src/db'
+import bcrypt from 'bcryptjs'
+import { sendEmail } from '@/src/mail'
 
 export async function GET() {
   return NextResponse.json({
@@ -13,8 +15,6 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB()
     const reqBody = await req.json()
-    console.log(reqBody)
-
     const { username, email, password } = reqBody
 
     const user = await User.findOne({ email })
@@ -28,10 +28,14 @@ export async function POST(req: NextRequest) {
     const newUser = new User({
       username,
       email,
-      password
+      password: await bcrypt.hash(password, 12)
     })
+
     const savedUser = await newUser.save()
-    console.log('User Save Sussessfullly', savedUser._id)
+
+    console.log(`Email Sending.....`)
+    await sendEmail({ email, emailType: 'VERIFY', userId: savedUser._id })
+    console.log(`Email Send Successfully.....`)
 
     return NextResponse.json(
       {
@@ -42,12 +46,13 @@ export async function POST(req: NextRequest) {
       }
     )
   } catch (error) {
-    console.error('❌ Signup Error:', error) // 👈 Add this
+    console.log('Error in Signup Route')
+
     return NextResponse.json(
       {
         message: 'Internal Error in Signup'
       },
       { status: 500 }
-    ) // 👈 Add status
+    )
   }
 }
