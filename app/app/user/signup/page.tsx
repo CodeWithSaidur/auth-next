@@ -69,7 +69,7 @@ const Page = () => {
           {disabledButton ? 'Signup' : 'No Signup'}
         </button>
         <br />
-        <Link href="/login" className="text-center">
+        <Link href="/app/user/login" className="text-center">
           Login
         </Link>
       </div>

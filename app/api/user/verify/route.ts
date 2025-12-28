@@ -1,4 +1,5 @@
 import { User } from '@/src/user.model'
+import { NextResponse } from 'next/server'
 
 export async function GET(req: Request) {
   try {
@@ -40,14 +41,17 @@ export async function GET(req: Request) {
       )
     }
 
-    return Response.json(
-      {
-        message: 'Verification Success'
-      },
-      {
-        status: 200
-      }
-    )
+    // redirect to '/app/user/verify'
+    return NextResponse.redirect(new URL('/app/user/verify', req.url))
+
+    // return Response.json(
+    //   {
+    //     message: 'Verification Success'
+    //   },
+    //   {
+    //     status: 200
+    //   }
+    // )
   } catch (error) {
     return Response.json(
       {
